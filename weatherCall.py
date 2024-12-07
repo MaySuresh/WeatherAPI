@@ -3,7 +3,7 @@ import json
 
 API = "eef1c80c1154b64315081e125d5a37d6"
 locationData = {}
-FAV_CITIES = "favorite_cities.json"
+fav_cities_file = "favorite_cities.json"
 
 """This Python program comprises of 4 functions
 
@@ -15,16 +15,14 @@ FAV_CITIES = "favorite_cities.json"
 
 def saved_cities():
     """ This function fetch the list of Favorited Cities"""
-    try:
-        with open(FAV_CITIES, "r") as file:
+    with open(fav_cities_file, "r") as file:
             return json.load(file)
-    except FileNotFoundError:
-        return []
+   
     
 
 def save_cities(fav_cities):
     """This function saves the list of Favorited Cities"""
-    with open(FAV_CITIES, "w") as file:
+    with open(fav_cities_file, "w") as file:
         json.dump(fav_cities,file)
 
 def coordinates(name):
