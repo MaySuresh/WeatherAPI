@@ -3,19 +3,32 @@ import json
 
 API = "eef1c80c1154b64315081e125d5a37d6"
 locationData = {}
-FAV_CITIES_FILE = "favorite_cities.json"
+FAV_CITIES = "favorite_cities.json"
+
+"""This Python program comprises of 4 functions
+
+    1. saved_cities() --> this function will read the json file where the favorited cities are listed in a json data format
+    2. save_cities() --> this function will write data stored in the fav_cities variable 
+    3. coordinates() --> this function will take a city name and output the longitude and latitude of the city so it can be used in the weather_call() function
+    4. weather_call() --> this function will take the longitude and latitude from the coordinates() function and output the weather of the particular coordinates
+"""
 
 def saved_cities():
+    """ This function fetch the list of Favorited Cities"""
     try:
-        with open(FAV_CITIES_FILE, "r") as file:
+        with open(FAV_CITIES, "r") as file:
             return json.load(file)
     except FileNotFoundError:
         return []
+    
+
 def save_cities(fav_cities):
-    with open(FAV_CITIES_FILE, "w") as file:
+    """This function saves the list of Favorited Cities"""
+    with open(FAV_CITIES, "w") as file:
         json.dump(fav_cities,file)
 
 def coordinates(name):
+        """This function will get the longitude and latitude of the city using the Geolocaton API"""        
         global locationData
         url = f"http://api.openweathermap.org/geo/1.0/direct?q={name}&limit=1&appid={API}"
         try:
@@ -35,8 +48,11 @@ def coordinates(name):
         except requests.exceptions.RequestException as e:
             print(f"Error: {e}")
             return None
+        
+
+
 def weather_call(name, lat, lon):
-    
+    """This function will get weather of the city"""
     url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API}"
     try: 
         response = requests.get(url)
@@ -61,6 +77,7 @@ def weather_call(name, lat, lon):
 def main():
     fav_cities = saved_cities()
 
+    """Here is the start of the menu"""
     print("Weather Application:")
     print("1. Add a city to you favorite list")
     print("2. View favorited cities' weathers")
@@ -68,10 +85,25 @@ def main():
     option = input("Choose one of the options: ")
     
     if option == "1":
+
+        """If the option 1 is choosen then the program will first check if there are more than 3 cities in the list"""
+
+        if len (fav_cities) >=3:
+            print("Maximum 3 cities allowed, remove a city")
+            for i in fav_cities:
+                print(f"  {i}")
+
+            """If there are more then 3 cities in the file then the program will prompt the user to remove a city"""
+
+            remove_city = input("Type the name of the city to remove: ")
+            fav_cities.remove(remove_city)
+            save_cities(fav_cities)
+        
+        """After the max capacity problem is resolved the program will move forward to add a city in the favorites list """
+
         city = input("Enter the city's name: ")
         if city not in fav_cities:
-            fav_cities.append(city)
-            
+            fav_cities.append(city)               
             print(f"{city} has been added to your favorites.")
             location = coordinates(city)
             if location:
@@ -85,7 +117,9 @@ def main():
                 print(f"Cannot find {city}")
         else:
             print(f"{city} is already in your favorites.")
+
     elif option == "2":
+        """If the option 2 is choosen then the program output the weather for the cities"""
         if not fav_cities:
             print("You have no favorite cities.")
         else: 
@@ -101,6 +135,7 @@ def main():
                 else: 
                     print(f"Cannot find {i}")
     elif option == "3":
+        """If the option 3 is choosen it will end the program"""
         print("Ending Program")
     else: 
         print("Invalid Option")
